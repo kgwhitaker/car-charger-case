@@ -30,7 +30,7 @@ overlap = 0.1;
 wire_exit_diameter = 8;
 
 // Distance from the base of the charger to the exit point that it tapers too.
-wire_enclosure_height = 15;
+wire_enclosure_height = 20;
 
 // *** "Private" variables ***
 /* [Hidden] */

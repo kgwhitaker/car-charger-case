@@ -43,27 +43,49 @@ $fa = 1;
 $fs = 0.4;
 
 //
-// Builds the case.
+// Builds the base case.
 //
 module charger_case() {
-  // threaded_nut(shape="cylinder", nutwidth=16, id=8, h=8, pitch=1.25, $slop=0.1, $fa=1, $fs=1);
 
-  diff()
-    cyl(h=case_base_height, d=case_diameter) {
+  union() {
 
-      tag("remove")
-        threaded_rod(d=charger_diameter, height=case_base_height + 2, pitch=thread_pitch);
+    diff()
+      cyl(h=case_base_height, d=case_diameter) {
 
-    //   tag("keep") position(TOP) 
-    //     cyl(l=wire_enclosure_height, d1=charger_diameter + case_wall_thickness,
-    //          d2=wire_exit_diameter + 2*case_wall_thickness, anchor=BOTTOM);
+        tag("keep") position(TOP)
+            cyl(
+              l=wire_enclosure_height, d1=charger_diameter + case_wall_thickness,
+              d2=wire_exit_diameter + 2 * case_wall_thickness, anchor=BOTTOM
+            );
 
-    //   tag("keep") position(TOP) color("red")
-    //     cyl(l=wire_enclosure_height + 2, d1=charger_diameter,
-    //          d2=wire_exit_diameter, anchor=BOTTOM);
-
-
-    }
+        tag("remove")
+          threaded_rod(d=charger_diameter, height=case_base_height + 2, pitch=thread_pitch);
+      }
+  }
 }
 
-charger_case();
+
+// 
+// The wire exit area where connections are made and leaves the case.
+//
+module wire_exit() {
+  translate([0, 0, (case_base_height / 2) - overlap])
+    cyl(
+      l=wire_enclosure_height + 2, d1=charger_diameter,
+      d2=wire_exit_diameter, anchor=BOTTOM
+    );
+}
+
+//
+// Builds the entire model.
+//
+module build_model() {
+  difference() {
+    charger_case();
+
+    wire_exit();
+  }
+}
+
+// Build the model
+build_model();

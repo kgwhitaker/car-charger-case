@@ -64,12 +64,32 @@ module charger_case() {
   }
 }
 
+//
+// Creates a square charger case.
+//
+module square_charger_case() {
+  union() {
+
+    diff()
+      cuboid(size=[case_diameter, case_diameter, case_base_height], rounding=5, except=[TOP, BOT], anchor=BOT) {
+
+        exit_size = wire_exit_diameter + 2 * case_wall_thickness;
+        tag("keep") position(TOP)
+            prismoid(size1=[case_diameter, case_diameter], size2=[exit_size, exit_size], h=wire_enclosure_height, anchor=BOTTOM, rounding=5);
+
+        tag("remove")
+          threaded_rod(d=charger_diameter, height=case_base_height + 2, pitch=thread_pitch);
+      }
+  }
+}
 
 // 
 // The wire exit area where connections are made and leaves the case.
 //
 module wire_exit() {
-  translate([0, 0, (case_base_height / 2) - overlap])
+
+  translate([0, 0, (case_base_height) - overlap])
+    color("red")
     cyl(
       l=wire_enclosure_height + 2, d1=charger_diameter,
       d2=wire_exit_diameter, anchor=BOTTOM
@@ -80,11 +100,16 @@ module wire_exit() {
 // Builds the entire model.
 //
 module build_model() {
+
   difference() {
-    charger_case();
+    square_charger_case();;
+    // charger_case();
 
     wire_exit();
   }
+
+    //   wire_exit();
+
 }
 
 // Build the model

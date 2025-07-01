@@ -123,7 +123,7 @@ module feed_tube(z_offset) {
 
     s_cut = 16;
     translate([0, s_cut / 2, z_offset + 8])
-      cuboid(size=[s_cut, s_cut, s_cut], center=true);
+      cuboid(size=[s_cut, s_cut, s_cut]);
   }
 }
 

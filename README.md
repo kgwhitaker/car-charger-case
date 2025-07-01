@@ -10,7 +10,7 @@ opening size are somewhat standard.
 
 ## Printing the Case
 
-Because of the threads, if I used a 0.12 layer height.  Using a 0.2 layer height did not result in clean prints.
+Because of the threads, I used a 0.12 layer height.  Using a 0.2 layer height did not result in clean prints.
 I used PETG since it will be going into a hot motorcycle tank bag.  Should work fine in PLA, just be aware of your
 use case.
 

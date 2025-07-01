@@ -32,6 +32,12 @@ wire_exit_diameter = 8;
 // Distance from the base of the charger to the exit point that it tapers too.
 wire_enclosure_height = 20;
 
+// Wire feed tube height.
+wire_feed_tube = 20;
+
+// Option to create a square case.
+square_case = false;
+
 // *** "Private" variables ***
 /* [Hidden] */
 
@@ -43,7 +49,7 @@ $fa = 1;
 $fs = 0.4;
 
 //
-// Builds the base case.
+// Builds the round base case.
 //
 module charger_case() {
 
@@ -69,7 +75,6 @@ module charger_case() {
 //
 module square_charger_case() {
   union() {
-
     diff()
       cuboid(size=[case_diameter, case_diameter, case_base_height], rounding=5, except=[TOP, BOT], anchor=BOT) {
 
@@ -86,10 +91,11 @@ module square_charger_case() {
 // 
 // The wire exit area where connections are made and leaves the case.
 //
-module wire_exit() {
+module wire_exit(z_offset) {
 
-  translate([0, 0, (case_base_height) - overlap])
-    color("red")
+  echo("z_offset = ", z_offset);
+
+  translate([0, 0, z_offset])
     cyl(
       l=wire_enclosure_height + 2, d1=charger_diameter,
       d2=wire_exit_diameter, anchor=BOTTOM
@@ -97,18 +103,30 @@ module wire_exit() {
 }
 
 //
+// Feed tube that runs up to the wire enclosure.
+//
+module feed_tube(z_offset) {
+  translate([0, 0, z_offset ])
+    tube(h=wire_feed_tube, ir=5, wall=2);
+}
+
+//
 // Builds the entire model.
 //
 module build_model() {
+  feed_tube(case_base_height / 2 + wire_enclosure_height + wire_feed_tube / 2);
 
   difference() {
-    square_charger_case();;
-    // charger_case();
+    if (square_case)
+      square_charger_case();
+    else
+      charger_case();
 
-    wire_exit();
+    if (square_case)
+      wire_exit(z_offset=( (case_base_height) - overlap));
+    else
+      wire_exit(z_offset=( (case_base_height / 2) - overlap));
   }
-
-    //   wire_exit();
 
 }
 

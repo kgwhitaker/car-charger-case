@@ -106,15 +106,35 @@ module wire_exit(z_offset) {
 // Feed tube that runs up to the wire enclosure.
 //
 module feed_tube(z_offset) {
-  translate([0, 0, z_offset ])
-    tube(h=wire_feed_tube, ir=5, wall=2);
+  difference() {
+    translate([0, 0, z_offset])
+      tube(h=wire_feed_tube, ir=5, wall=2);
+
+    // translate([0, 2, z_offset - 4])
+    //   cuboid(size=[2,2,2]);
+
+    translate([0, 0, z_offset + 4])
+      rotate(-45)
+        cuboid(size=[20, 4, 4]);
+
+    translate([0, 0, z_offset + 4])
+      rotate(45)
+        cuboid(size=[20, 4, 4]);
+
+    s_cut = 16;
+    translate([0, s_cut / 2, z_offset + 8])
+      cuboid(size=[s_cut, s_cut, s_cut], center=true);
+  }
 }
 
 //
 // Builds the entire model.
 //
 module build_model() {
-  feed_tube(case_base_height / 2 + wire_enclosure_height + wire_feed_tube / 2);
+  if (square_case)
+    feed_tube(case_base_height + wire_enclosure_height + wire_feed_tube / 2);
+  else
+    feed_tube(case_base_height / 2 + wire_enclosure_height + wire_feed_tube / 2);
 
   difference() {
     if (square_case)
@@ -127,7 +147,6 @@ module build_model() {
     else
       wire_exit(z_offset=( (case_base_height / 2) - overlap));
   }
-
 }
 
 // Build the model

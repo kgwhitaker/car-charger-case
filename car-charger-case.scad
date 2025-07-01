@@ -18,13 +18,10 @@ case_base_height = 44;
 case_wall_thickness = 3;
 
 // Charger Threaded Hole Diameter
-charger_diameter = 29;
+charger_diameter = 30;
 
 // Thread pitch for the charger hole.
 thread_pitch = 1.5;
-
-// Overlap Tolerance for cutting objects when needed.
-overlap = 0.1;
 
 // Diameter for hole for the wire to exit the case
 wire_exit_diameter = 8;
@@ -35,9 +32,6 @@ wire_enclosure_height = 20;
 // Wire feed tube height.
 wire_feed_tube = 20;
 
-// Option to create a square case.
-square_case = false;
-
 // *** "Private" variables ***
 /* [Hidden] */
 
@@ -47,6 +41,9 @@ case_diameter = charger_diameter + case_wall_thickness;
 // OpenSCAD System Settings
 $fa = 1;
 $fs = 0.4;
+
+// Overlap Tolerance for cutting objects when needed.
+overlap = 0.1;
 
 //
 // Builds the round base case.
@@ -70,31 +67,10 @@ module charger_case() {
   }
 }
 
-//
-// Creates a square charger case.
-//
-module square_charger_case() {
-  union() {
-    diff()
-      cuboid(size=[case_diameter, case_diameter, case_base_height], rounding=5, except=[TOP, BOT], anchor=BOT) {
-
-        exit_size = wire_exit_diameter + 2 * case_wall_thickness;
-        tag("keep") position(TOP)
-            prismoid(size1=[case_diameter, case_diameter], size2=[exit_size, exit_size], h=wire_enclosure_height, anchor=BOTTOM, rounding=5);
-
-        tag("remove")
-          threaded_rod(d=charger_diameter, height=case_base_height + 2, pitch=thread_pitch);
-      }
-  }
-}
-
 // 
 // The wire exit area where connections are made and leaves the case.
 //
 module wire_exit(z_offset) {
-
-  echo("z_offset = ", z_offset);
-
   translate([0, 0, z_offset])
     cyl(
       l=wire_enclosure_height + 2, d1=charger_diameter,
@@ -110,9 +86,7 @@ module feed_tube(z_offset) {
     translate([0, 0, z_offset])
       tube(h=wire_feed_tube, ir=5, wall=2);
 
-    // translate([0, 2, z_offset - 4])
-    //   cuboid(size=[2,2,2]);
-
+    // This creates cutouts for the zip tie for wire strain relief
     translate([0, 0, z_offset + 4])
       rotate(-45)
         cuboid(size=[20, 4, 4]);
@@ -131,21 +105,12 @@ module feed_tube(z_offset) {
 // Builds the entire model.
 //
 module build_model() {
-  if (square_case)
-    feed_tube(case_base_height + wire_enclosure_height + wire_feed_tube / 2);
-  else
-    feed_tube(case_base_height / 2 + wire_enclosure_height + wire_feed_tube / 2);
+  feed_tube(case_base_height / 2 + wire_enclosure_height + wire_feed_tube / 2);
 
   difference() {
-    if (square_case)
-      square_charger_case();
-    else
-      charger_case();
+    charger_case();
 
-    if (square_case)
-      wire_exit(z_offset=( (case_base_height) - overlap));
-    else
-      wire_exit(z_offset=( (case_base_height / 2) - overlap));
+    wire_exit(z_offset=( (case_base_height / 2) - overlap));
   }
 }
 
